@@ -17,7 +17,7 @@
       placeholder="请输入id"
       v-model="client"
       clearable>
-      <el-button type="success" slot="append">上线</el-button>
+      <el-button type="success" slot="append" @click="wsInit()">上线</el-button>
     </el-input>
     <el-input
       placeholder="请输入目标id"
@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     wsInit () {
-      let socketUrl = 'http://localhost:9999/ws/' + this.client
+      let socketUrl = 'http://localhost:9999/wsMessage/' + this.client
       socketUrl = socketUrl.replace('https', 'ws').replace('http', 'ws')
       console.log(socketUrl)
       if (this.socket != null) {
@@ -52,7 +52,7 @@ export default {
       // 打开事件
       this.socket.onopen = function () {
         console.log('websocket已打开')
-        this.socket.send('{"client":"' + this.client + '","target":"' + this.target + '", "msg":"' + this.client + '已上线"}')
+        this.socket.send('{"target":"' + this.target + '", "msg":"' + this.client + '已上线"}')
       }
       // 获得消息事件
       this.socket.onmessage = function (msg) {
