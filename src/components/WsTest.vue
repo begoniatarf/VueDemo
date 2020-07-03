@@ -40,8 +40,8 @@ export default {
     }
   },
   methods: {
-    wsInit (id) {
-      let socketUrl = 'http://localhost:9999/demo/imserver/' + id
+    wsInit () {
+      let socketUrl = 'http://localhost:9999/ws/' + this.client
       socketUrl = socketUrl.replace('https', 'ws').replace('http', 'ws')
       console.log(socketUrl)
       if (this.socket != null) {
@@ -52,12 +52,11 @@ export default {
       // 打开事件
       this.socket.onopen = function () {
         console.log('websocket已打开')
-        this.socket.send('{"target":"' + id + '", "msg":""}')
+        this.socket.send('{"client":"' + this.client + '","target":"' + this.target + '", "msg":"' + this.client + '已上线"}')
       }
       // 获得消息事件
       this.socket.onmessage = function (msg) {
         console.log(msg.data)
-        // 发现消息进入    开始处理前端触发逻辑
       }
       // 关闭事件
       this.socket.onclose = function () {
