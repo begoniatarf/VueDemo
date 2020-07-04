@@ -10,7 +10,7 @@
         placeholder="请输入内容"
         v-model="msg"
         clearable>
-        <el-button type="success" slot="append">发送</el-button>
+        <el-button type="success" slot="append" @click="sendMsg()">发送</el-button>
       </el-input>
     </div>
     <el-input
@@ -40,30 +40,49 @@ export default {
     }
   },
   methods: {
+    sendMsg () {
+      const param = {
+        client: this.client,
+        target: this.target,
+        msg: this.msg,
+        type: 'sendMsg'
+      }
+      this.socket.send(JSON.stringify(param))
+    },
     wsInit () {
-      let socketUrl = 'http://localhost:9999/wsMessage/' + this.client
-      socketUrl = socketUrl.replace('https', 'ws').replace('http', 'ws')
-      console.log(socketUrl)
+      let socketUrl = 'ws://localhost:9999/wsMessage/' + this.client
       if (this.socket != null) {
         this.socket.close()
         this.socket = null
       }
       this.socket = new WebSocket(socketUrl)
       // 打开事件
-      this.socket.onopen = function () {
-        console.log('websocket已打开')
-        this.socket.send('{"target":"' + this.target + '", "msg":"' + this.client + '已上线"}')
+      this.socket.onopen = () => {
+        const param = {
+          client: this.client,
+          target: 'all',
+          msg: this.client + '已上线',
+          type: 'online'
+        }
+        this.socket.send(JSON.stringify(param))
       }
       // 获得消息事件
-      this.socket.onmessage = function (msg) {
-        console.log(msg.data)
+      this.socket.onmessage = (msg) => {
+        if (msg.data != null) {
+          const message = JSON.parse(msg.data)
+          if (message.type === 'notice') {
+            alert(message.msg)
+          } else if (message.type === 'msg') {
+            this.messageList.push(message.client + ':' + message.msg)
+          }
+        }
       }
       // 关闭事件
-      this.socket.onclose = function () {
+      this.socket.onclose = () => {
         console.log('websocket已关闭')
       }
       // 发生了错误事件
-      this.socket.onerror = function () {
+      this.socket.onerror = () => {
         console.log('websocket发生了错误')
       }
     }
