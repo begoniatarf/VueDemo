@@ -51,6 +51,7 @@ export default {
     },
     wsInit () {
       let socketUrl = 'ws://localhost:9999/wsMessage/' + this.client
+      // let socketUrl = 'ws://39.105.155.193:9999/wsMessage/' + this.client
       if (this.socket != null) {
         this.socket.close()
         this.socket = null
